@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Chat from "./chat";
 import "./App.css";
 import io from "socket.io-client";
-
 const socket = io.connect("/");
+
 function App() {
   const [userName, setUserName] = useState("");
   const [open, setOpen] = useState(false);

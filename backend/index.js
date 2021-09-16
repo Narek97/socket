@@ -22,18 +22,24 @@ app.get("/", async function (req, res) {
   const logs = data.split("\r\n").filter((i) => !!i);
   res.json(logs);
 });
+
 const io = socket(server);
 
 io.on("connection", (socket) => {
-  socket.on("chat", (message) => {
+  console.log("user is connected ip", socket.id);
+  socket.on("sendData", (message) => {
     io.emit("message", message);
     message = JSON.stringify(message);
     fs.appendFile(logsPath, `${message}\r\n`);
   });
-  socket.on("focuses", (id, userName) => {
-    io.emit("disableInput", id, userName);
+  socket.on("focuses", (userName) => {
+    socket.broadcast.emit("disableInput", userName);
   });
   socket.on("blur", () => {
+    io.emit("enableInput");
+  });
+  socket.on("disconnect", () => {
+    console.log("user is disconnected ip", socket.id);
     io.emit("enableInput");
   });
 });

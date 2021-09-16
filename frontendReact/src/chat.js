@@ -32,11 +32,9 @@ function Chat({ socket, userName, userId }) {
       });
       setLetters([...arrayOfLetters]);
     });
-    socket.on("disableInput", (id, userName) => {
-      if (id !== userId) {
-        setInputDisable(true);
-        setMessageWhoTyping(`${userName} typing please wait ...`);
-      }
+    socket.on("disableInput", (userName) => {
+      setInputDisable(true);
+      setMessageWhoTyping(`${userName} typing please wait ...`);
     });
     socket.on("enableInput", () => {
       setInputDisable(false);
@@ -46,26 +44,28 @@ function Chat({ socket, userName, userId }) {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      socket.emit("blur");
+      // socket.emit("blur");
+      console.log("error");
     }, 5000);
     return () => clearTimeout(timer);
   }, [message, inputDisable]);
 
   const focuses = () => {
-    socket.emit("focuses", userId, userName);
+    socket.emit("focuses", userName);
   };
+
   const blur = () => {
     socket.emit("blur");
   };
 
   const handleChange = (e) => {
     setMessage(e.target.value);
-    socket.emit("focuses", userId, userName);
+    socket.emit("focuses", userName);
   };
 
   const sendData = () => {
     if (message !== "") {
-      socket.emit("chat", {
+      socket.emit("sendData", {
         userId,
         userName,
         message,
