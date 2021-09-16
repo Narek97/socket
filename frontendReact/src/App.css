@@ -1,0 +1,24 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.chat-message {
+  max-width: 400px;
+  height: auto;
+  margin: 40px auto;
+}
+
+.message {
+  text-align: left;
+  color: green;
+}
+
+.mess-right {
+  text-align: right;
+  color: red;
+}
