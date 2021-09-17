@@ -1,7 +1,7 @@
 import io from "socket.io-client";
-const useSocket = (element) => {
-  const socket = io.connect("/");
+const socket = io.connect("/");
 
+const useSocket = (element) => {
   const emitActiveElement = () => {
     socket.emit("activeElement");
   };

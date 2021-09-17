@@ -1,19 +1,10 @@
-import React, { useRef } from "react";
-
-import useSocket from "./util/socket";
+import React from "react";
+import Input from "./Input";
 
 function App() {
-  const inputRef = useRef(null);
-  const [emitActiveElement, emitPassiveElement] = useSocket(inputRef);
-
   return (
     <div>
-      <input
-        type="text"
-        ref={inputRef}
-        onFocus={() => emitActiveElement()}
-        onBlur={() => emitPassiveElement()}
-      />
+      <Input />
     </div>
   );
 }
