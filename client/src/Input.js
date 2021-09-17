@@ -1,15 +1,15 @@
 import React, { useRef, useState, useEffect } from "react";
-import useSocket from "./util/socket";
+import useSocket from "./util/useSocket";
 
 function Input() {
   const [inputText, setInputText] = useState("");
   const [activeInput, setActiveInput] = useState(false);
   const inputRef = useRef(null);
-  const [emitActiveElement, emitPassiveElement] = useSocket(inputRef);
+  const [emitActiveElement, emitPassiveElement] = useSocket();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      emitPassiveElement();
+      emitPassiveElement(inputRef);
       inputRef.current.blur();
     }, 5000);
     return () => clearTimeout(timer);
@@ -21,12 +21,12 @@ function Input() {
   const focus = () => {
     console.log("focus");
     setActiveInput(true);
-    emitActiveElement();
+    emitActiveElement(inputRef);
   };
   const blur = () => {
     console.log("blur");
     setActiveInput(false);
-    emitPassiveElement();
+    emitPassiveElement(inputRef);
   };
   return (
     <div>
