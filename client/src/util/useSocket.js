@@ -13,16 +13,14 @@ const useSocket = () => {
   };
   socket.on("disableElement", () => {
     if (element) {
-      element.current.disabled = true;
+      element.disabled = true;
     }
   });
   socket.on("enableElement", () => {
-    console.log(element, "element");
     if (element) {
-      element.current.disabled = false;
+      element.disabled = false;
     }
   });
-
   return [emitActiveElement, emitPassiveElement];
 };
 

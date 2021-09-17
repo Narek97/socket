@@ -9,7 +9,7 @@ function Input() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      emitPassiveElement(inputRef);
+      emitPassiveElement(inputRef.current);
       inputRef.current.blur();
     }, 5000);
     return () => clearTimeout(timer);
@@ -18,15 +18,15 @@ function Input() {
   const handleChange = (e) => {
     setInputText(e.target.value);
   };
-  const focus = () => {
+  const focus = (e) => {
     console.log("focus");
     setActiveInput(true);
-    emitActiveElement(inputRef);
+    emitActiveElement(e.target);
   };
-  const blur = () => {
+  const blur = (e) => {
     console.log("blur");
     setActiveInput(false);
-    emitPassiveElement(inputRef);
+    emitPassiveElement(e.target);
   };
   return (
     <div>
@@ -35,8 +35,8 @@ function Input() {
         type="text"
         ref={inputRef}
         onChange={handleChange}
-        onBlur={() => blur()}
-        onFocus={() => focus()}
+        onBlur={blur}
+        onFocus={focus}
       />
     </div>
   );
