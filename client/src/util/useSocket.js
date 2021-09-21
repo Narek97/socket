@@ -1,24 +1,28 @@
 import io from "socket.io-client";
 const socket = io.connect("/");
 
-const useSocket = () => {
-  let element = null;
-  const emitActiveElement = (ref) => {
-    element = ref;
+const useSocket = (ref) => {
+  const emitActiveElement = () => {
     socket.emit("activeElement");
   };
-  const emitPassiveElement = (ref) => {
-    element = ref;
+  const emitPassiveElement = () => {
     socket.emit("passiveElement");
   };
   socket.on("disableElement", () => {
-    if (element) {
-      element.disabled = true;
+    if (ref) {
+      ref.current.disabled = true;
     }
   });
   socket.on("enableElement", () => {
-    if (element) {
-      element.disabled = false;
+    console.log("enableElement");
+    if (ref) {
+      ref.current.disabled = false;
+    }
+  });
+  socket.on("connect_error", (err) => {
+    console.log(`connect_error socket due to ${err}`);
+    if (ref) {
+      ref.current.disabled = true;
     }
   });
   return [emitActiveElement, emitPassiveElement];

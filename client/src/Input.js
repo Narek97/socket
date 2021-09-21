@@ -5,8 +5,7 @@ function Input() {
   const [inputText, setInputText] = useState("");
   const [activeInput, setActiveInput] = useState(false);
   const inputRef = useRef(null);
-  const [emitActiveElement, emitPassiveElement] = useSocket();
-
+  const [emitActiveElement, emitPassiveElement] = useSocket(inputRef);
   useEffect(() => {
     const timer = setTimeout(() => {
       emitPassiveElement(inputRef.current);
@@ -17,14 +16,14 @@ function Input() {
 
   const handleChange = (e) => {
     setInputText(e.target.value);
+    setActiveInput(true);
+    emitActiveElement(e.target);
   };
   const focus = (e) => {
-    console.log("focus");
     setActiveInput(true);
     emitActiveElement(e.target);
   };
   const blur = (e) => {
-    console.log("blur");
     setActiveInput(false);
     emitPassiveElement(e.target);
   };
