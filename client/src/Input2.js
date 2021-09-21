@@ -1,15 +1,16 @@
 import React, { useRef, useState, useEffect } from "react";
-import useSocket from "./util/useSocket";
+import useLockWatcher from "./util/useLockWatcher";
 
-function Input() {
+function Input2() {
   const [inputText, setInputText] = useState("");
   const [activeInput, setActiveInput] = useState(false);
   const inputRef = useRef(null);
-  const [emitActiveElement, emitPassiveElement] = useSocket(inputRef);
+
+  const { lockStatus, whenSendLockMessage, whenSendUnLockMessage } =
+    useLockWatcher(inputRef);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      emitPassiveElement(inputRef.current);
       inputRef.current.blur();
     }, 5000);
     return () => clearTimeout(timer);
@@ -20,13 +21,16 @@ function Input() {
     setActiveInput(true);
   };
   const focus = () => {
+    console.log("focus");
+    whenSendLockMessage();
     setActiveInput(true);
-    emitActiveElement();
   };
   const blur = () => {
+    console.log("blur");
+    whenSendUnLockMessage();
     setActiveInput(false);
-    emitPassiveElement();
   };
+
   return (
     <div>
       <input
@@ -41,4 +45,4 @@ function Input() {
   );
 }
 
-export default Input;
+export default Input2;

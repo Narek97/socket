@@ -33,7 +33,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     let userId = getUserId();
     console.log(`user is disconnected ip ${socket.id}`);
-    console.log(socket.id === userId);
     if (socket.id === userId) {
       user_Disconnect();
       io.emit("enableElement");
