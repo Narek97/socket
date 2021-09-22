@@ -4,17 +4,14 @@ import useLockWatcher from "./util/useLockWatcher";
 function Example() {
   const [inputText, setInputText] = useState("");
   const inputRef = useRef(null);
-  const buttonRef = useRef(null);
 
   const { status, whenSendLockMessage, whenSendUnLockMessage } =
-    useLockWatcher(inputRef);
+    useLockWatcher();
 
   useEffect(() => {
     status
-      ? (inputRef.current.disabled = true) &&
-        (buttonRef.current.disabled = true)
-      : (inputRef.current.disabled = false) &&
-        (buttonRef.current.disabled = false);
+      ? (inputRef.current.disabled = true)
+      : (inputRef.current.disabled = false);
   }, [status]);
 
   useEffect(() => {
@@ -35,10 +32,6 @@ function Example() {
     whenSendUnLockMessage();
   };
 
-  const handleClick = () => {
-    whenSendLockMessage();
-  };
-
   return (
     <div>
       <input
@@ -49,10 +42,6 @@ function Example() {
         onBlur={blur}
         onFocus={focus}
       />
-
-      <button ref={buttonRef} onClick={handleClick}>
-        Click
-      </button>
     </div>
   );
 }

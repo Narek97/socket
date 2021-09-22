@@ -3,7 +3,7 @@ const cors = require("cors");
 const socket = require("socket.io");
 const app = express();
 const PORT = 5000;
-const { user_Disconnect, join_User, getUserId } = require("./dummyuser");
+const { userDisconnect, joinUser, getUserId } = require("./dummyuser");
 
 // ========================================
 app.use(express());
@@ -23,18 +23,18 @@ io.on("connection", (socket) => {
     socket.emit("disableElement");
   }
   socket.on("activeElement", () => {
-    join_User(socket.id);
+    joinUser(socket.id);
     socket.broadcast.emit("disableElement");
   });
   socket.on("passiveElement", () => {
-    user_Disconnect();
+    userDisconnect();
     socket.broadcast.emit("enableElement");
   });
   socket.on("disconnect", () => {
     let userId = getUserId();
     console.log(`user is disconnected ip ${socket.id}`);
     if (socket.id === userId) {
-      user_Disconnect();
+      userDisconnect();
       io.emit("enableElement");
     }
   });
