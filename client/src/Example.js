@@ -1,34 +1,42 @@
 import React, { useRef, useState, useEffect } from "react";
 import useLockWatcher from "./util/useLockWatcher";
 
-function Input2() {
+function Example() {
   const [inputText, setInputText] = useState("");
-  const [activeInput, setActiveInput] = useState(false);
   const inputRef = useRef(null);
+  const buttonRef = useRef(null);
 
-  const { lockStatus, whenSendLockMessage, whenSendUnLockMessage } =
+  const { status, whenSendLockMessage, whenSendUnLockMessage } =
     useLockWatcher(inputRef);
 
   useEffect(() => {
+    status
+      ? (inputRef.current.disabled = true) &&
+        (buttonRef.current.disabled = true)
+      : (inputRef.current.disabled = false) &&
+        (buttonRef.current.disabled = false);
+  }, [status]);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
+      status !== null && whenSendUnLockMessage();
       inputRef.current.blur();
     }, 5000);
     return () => clearTimeout(timer);
-  }, [inputText, activeInput]);
+  }, [inputText, status]);
 
   const handleChange = (e) => {
     setInputText(e.target.value);
-    setActiveInput(true);
   };
   const focus = () => {
-    console.log("focus");
     whenSendLockMessage();
-    setActiveInput(true);
   };
   const blur = () => {
-    console.log("blur");
     whenSendUnLockMessage();
-    setActiveInput(false);
+  };
+
+  const handleClick = () => {
+    whenSendLockMessage();
   };
 
   return (
@@ -41,8 +49,12 @@ function Input2() {
         onBlur={blur}
         onFocus={focus}
       />
+
+      <button ref={buttonRef} onClick={handleClick}>
+        Click
+      </button>
     </div>
   );
 }
 
-export default Input2;
+export default Example;

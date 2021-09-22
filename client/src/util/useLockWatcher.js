@@ -1,36 +1,44 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import io from "socket.io-client";
 const socket = io.connect("/");
 
-const useLockWatcher = (lockOwner, elementName) => {
-  const lockStatus = () => {};
-
-  const whenSendLockMessage = () => {
-    console.log("lock");
-    socket.emit("activeElement");
+const useLockWatcher = () => {
+  const [status, setStatus] = useState(null);
+  useEffect(() => {
     socket.on("disableElement", () => {
       console.log("disableElement");
-      onReceivedLockMessage();
+      whenReceiveLockMessage();
     });
-  };
-  const whenSendUnLockMessage = () => {
-    console.log("unlock");
-    socket.emit("passiveElement");
     socket.on("enableElement", () => {
       console.log("enableElement");
-      onReceivedUnLockMessage();
+      whenReceiveUnLockMessage();
     });
-  };
-  const onReceivedLockMessage = () => {
-    console.log("onReceivedLockMessage");
-    lockOwner.current.disabled = true;
-  };
-  const onReceivedUnLockMessage = () => {
-    console.log("onReceivedUnLockMessage");
-    lockOwner.current.disabled = false;
+    socket.on("connect_error", (err) => {
+      console.log(`connect_error socket due to ${err}`);
+      whenReceiveLockMessage();
+    });
+  }, [socket]);
+
+  const whenSendLockMessage = () => {
+    socket.emit("activeElement");
   };
 
-  return { lockStatus, whenSendLockMessage, whenSendUnLockMessage };
+  const whenSendUnLockMessage = () => {
+    socket.emit("passiveElement");
+  };
+  const whenReceiveLockMessage = () => {
+    setStatus(true);
+  };
+
+  const whenReceiveUnLockMessage = () => {
+    setStatus(false);
+  };
+
+  return {
+    status,
+    whenSendLockMessage,
+    whenSendUnLockMessage,
+  };
 };
 
 export default useLockWatcher;
