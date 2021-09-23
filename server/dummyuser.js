@@ -1,15 +1,47 @@
-let userId = null;
+let users = [];
+let activeUser = [];
 
-function joinUser(id) {
-  userId = id;
+function joinUser(socketId, lockOwner, topicName) {
+  const user = { socketId, lockOwner, topicName };
+  users.push(user);
+  return user;
+}
+
+function remove(name, id) {
+  const index = name.findIndex(
+    (user) => user.lockOwner === id || user.socketId === id
+  );
+  if (index !== -1) {
+    return name.splice(index, 1)[0];
+  }
 }
 
 function userDisconnect(id) {
-  userId = null;
+  return remove(users, id);
 }
 
-function getUserId() {
-  return userId;
+function getCurrentUser(id) {
+  return users.find((user) => user.lockOwner === id.toString());
 }
 
-module.exports = { getUserId, joinUser, userDisconnect };
+function joinActiveUser(socketId, lockOwner, topicName) {
+  const user = { socketId, lockOwner, topicName };
+  activeUser.push(user);
+}
+
+function getActiveUser(topicName) {
+  return activeUser.find((user) => user.topicName === topicName);
+}
+
+function removeActiveUser(id) {
+  return remove(activeUser, id);
+}
+
+module.exports = {
+  joinUser,
+  userDisconnect,
+  getCurrentUser,
+  joinActiveUser,
+  getActiveUser,
+  removeActiveUser,
+};

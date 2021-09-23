@@ -3,7 +3,14 @@ const cors = require("cors");
 const socket = require("socket.io");
 const app = express();
 const PORT = 5000;
-const { userDisconnect, joinUser, getUserId } = require("./dummyuser");
+const {
+  joinUser,
+  userDisconnect,
+  getCurrentUser,
+  joinActiveUser,
+  getActiveUser,
+  removeActiveUser,
+} = require("./dummyuser");
 
 // ========================================
 app.use(express());
@@ -16,27 +23,38 @@ const server = app.listen(
 // ========================================SOCKET
 const io = socket(server);
 
+//initializing the socket io connection
 io.on("connection", (socket) => {
-  console.log(`user is connected ip ${socket.id}`);
-  let userId = getUserId();
-  if (userId) {
-    socket.emit("disableElement");
-  }
-  socket.on("activeElement", () => {
-    joinUser(socket.id);
-    socket.broadcast.emit("disableElement");
+  console.log(`user connect ${socket.id}`);
+  socket.on("joinRoom", ({ lockOwner, topicName }) => {
+    const user = joinUser(socket.id, lockOwner, topicName);
+    socket.join(user.topicName);
+    console.log(`user join in room ${user.topicName}`);
+    let active = getActiveUser(topicName);
+    if (active) {
+      socket.emit("disableElement");
+    }
   });
-  socket.on("passiveElement", () => {
-    userDisconnect();
-    socket.broadcast.emit("enableElement");
+
+  socket.on("activeElement", ({ lockOwner, topicName }) => {
+    const user = getCurrentUser(lockOwner);
+    joinActiveUser(socket.id, lockOwner, topicName);
+    socket.broadcast.to(user.topicName).emit("disableElement");
   });
+
+  socket.on("passiveElement", ({ lockOwner, topicName }) => {
+    const user = getCurrentUser(lockOwner);
+    removeActiveUser(lockOwner);
+    socket.broadcast.to(user.topicName).emit("enableElement");
+  });
+
   socket.on("disconnect", () => {
-    let userId = getUserId();
-    console.log(`user is disconnected ip ${socket.id}`);
-    if (socket.id === userId) {
-      userDisconnect();
-      io.emit("enableElement");
+    userDisconnect(socket.id);
+    const user = removeActiveUser(socket.id);
+    if (user) {
+      io.to(user.topicName).emit("enableElement");
     }
   });
 });
+
 // ========================================

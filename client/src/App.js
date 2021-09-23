@@ -1,12 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import Example from "./Example";
-import Input from "./Input";
 
 function App() {
+  const [topicName, setTopicName] = useState("");
+  const [login, setLogin] = useState(false);
+
   return (
     <div>
-      {/* <Input /> */}
-      <Example />
+      {!login ? (
+        <>
+          <input
+            type="text"
+            value={topicName}
+            onChange={(e) => setTopicName(e.target.value)}
+          />
+          <button onClick={() => setLogin(true)}>Login</button>
+        </>
+      ) : (
+        <Example lockOwner={Date.now().toString()} topicName={topicName} />
+      )}
     </div>
   );
 }

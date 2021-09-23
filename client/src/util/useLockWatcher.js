@@ -1,44 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import io from "socket.io-client";
 const socket = io.connect("/");
 
-const useLockWatcher = () => {
-  const [status, setStatus] = useState(null);
+const useLockWatcher = ({
+  lockOwner,
+  topicName,
+  onReceivedLockMessage,
+  onReceivedUnLockMessage,
+}) => {
   useEffect(() => {
+    socket.emit("joinRoom", { lockOwner, topicName });
     socket.on("disableElement", () => {
       console.log("disableElement");
-      whenReceiveLockMessage();
+      onReceivedLockMessage();
     });
     socket.on("enableElement", () => {
       console.log("enableElement");
-      whenReceiveUnLockMessage();
+      onReceivedUnLockMessage();
     });
     socket.on("connect_error", (err) => {
       console.log(`connect_error socket due to ${err}`);
-      whenReceiveLockMessage();
+      onReceivedLockMessage();
     });
   }, [socket]);
 
-  const whenSendLockMessage = () => {
-    socket.emit("activeElement");
+  const whenSendLockMessage = (predicate) => {
+    predicate() && socket.emit("activeElement", { lockOwner, topicName });
   };
-
-  const whenSendUnLockMessage = () => {
-    socket.emit("passiveElement");
+  const whenSendUnLockMessage = (predicate) => {
+    predicate() && socket.emit("passiveElement", { lockOwner, topicName });
   };
-  const whenReceiveLockMessage = () => {
-    setStatus(true);
-  };
-
-  const whenReceiveUnLockMessage = () => {
-    setStatus(false);
-  };
-
-  return {
-    status,
-    whenSendLockMessage,
-    whenSendUnLockMessage,
-  };
+  return [whenSendLockMessage, whenSendUnLockMessage];
 };
 
 export default useLockWatcher;

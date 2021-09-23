@@ -1,35 +1,40 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import useLockWatcher from "./util/useLockWatcher";
 
-function Example() {
+function Example({ lockOwner, topicName }) {
   const [inputText, setInputText] = useState("");
+  const [inputFocus, setInputFocus] = useState(false);
+  const [inputBlur, setInputBlur] = useState(false);
+
   const inputRef = useRef(null);
 
-  const { status, whenSendLockMessage, whenSendUnLockMessage } =
-    useLockWatcher();
+  let [whenSendLockMessage, whenSendUnLockMessage] = useLockWatcher({
+    lockOwner,
+    topicName,
+    onReceivedLockMessage: () => {
+      inputRef.current.disabled = true;
+    },
+    onReceivedUnLockMessage: () => {
+      inputRef.current.disabled = false;
+    },
+  });
 
-  useEffect(() => {
-    status
-      ? (inputRef.current.disabled = true)
-      : (inputRef.current.disabled = false);
-  }, [status]);
+  whenSendLockMessage(() => {
+    return inputFocus && true;
+  });
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      status !== null && whenSendUnLockMessage();
-      inputRef.current.blur();
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, [inputText, status]);
+  whenSendUnLockMessage(() => {
+    return inputBlur && true;
+  });
 
-  const handleChange = (e) => {
-    setInputText(e.target.value);
-  };
   const focus = () => {
-    whenSendLockMessage();
+    setInputFocus(true);
+    setInputBlur(false);
   };
+
   const blur = () => {
-    whenSendUnLockMessage();
+    setInputFocus(false);
+    setInputBlur(true);
   };
 
   return (
@@ -38,9 +43,9 @@ function Example() {
         value={inputText}
         type="text"
         ref={inputRef}
-        onChange={handleChange}
-        onBlur={blur}
+        onChange={(e) => setInputText(e.target.value)}
         onFocus={focus}
+        onBlur={blur}
       />
     </div>
   );
