@@ -1,10 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useLockWatcher from "./util/useLockWatcher";
 
 function Example({ lockOwner, topicName }) {
   const [inputText, setInputText] = useState("");
   const [inputFocus, setInputFocus] = useState(false);
   const [inputBlur, setInputBlur] = useState(false);
+  const [timeOver, setTimeOver] = useState(false);
 
   const inputRef = useRef(null);
 
@@ -19,22 +20,36 @@ function Example({ lockOwner, topicName }) {
     },
   });
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimeOver(true);
+      inputRef.current.blur();
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [inputText, inputFocus]);
+
   whenSendLockMessage(() => {
     return inputFocus && true;
   });
 
   whenSendUnLockMessage(() => {
-    return inputBlur && true;
+    if (inputBlur || timeOver) {
+      return true;
+    } else {
+      return false;
+    }
   });
 
   const focus = () => {
     setInputFocus(true);
     setInputBlur(false);
+    setTimeOver(false);
   };
 
   const blur = () => {
     setInputFocus(false);
     setInputBlur(true);
+    setTimeOver(false);
   };
 
   return (

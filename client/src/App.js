@@ -3,6 +3,7 @@ import Example from "./Example";
 
 function App() {
   const [topicName, setTopicName] = useState("");
+  const [id, setId] = useState("");
   const [login, setLogin] = useState(false);
 
   return (
@@ -11,13 +12,20 @@ function App() {
         <>
           <input
             type="text"
+            placeholder="room name"
             value={topicName}
             onChange={(e) => setTopicName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="user id"
+            id={topicName}
+            onChange={(e) => setId(e.target.value)}
           />
           <button onClick={() => setLogin(true)}>Login</button>
         </>
       ) : (
-        <Example lockOwner={Date.now().toString()} topicName={topicName} />
+        <Example lockOwner={id} topicName={topicName} />
       )}
     </div>
   );
